@@ -25,7 +25,27 @@ app.get('/api',(req,res)=>{
 })
 
 app.get("/api/:date", (req, res) => {
-  
+  const dateParam = req.params.date //unix or YYYY-MM-DD 
+  const unixTimeZero = Date.parse("1970-01-01T00:00:00Z");
+  const dateParamInt = parseInt(dateParam)
+  //if dateParam is nan, it means that it's a string which is a invalid date
+  if(Number.isNaN(dateParamInt)){
+    res.json({ error : "Invalid Date" })
+  }
+  else{
+    const date = new Date(dateParam) //create Date obj
+    const isDateAUnix = isNaN(Date.parse(date)) //true if unix is input
+    switch (isDateAUnix) {
+      case true:
+        const utcDateForUnix = new Date(dateParam - unixTimeZero).toUTCString()
+        res.json({unix: dateParamInt, utc: utcDateForUnix})
+        break;
+      case false:
+        res.json({unix: Date.parse(date), utc:date.toUTCString() })
+        break;
+    }
+
+  }
   
 });
 
